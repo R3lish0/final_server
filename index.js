@@ -1,11 +1,10 @@
 import { config } from 'dotenv'
 import { MongoClient } from 'mongodb';
-import { cor } from "cors";
-import { ex} from "express";
 
 
-const cors = cor;
-const express = ex;
+
+const cors = require('cors');
+const express = require('express');
 const app = express();
 
 
