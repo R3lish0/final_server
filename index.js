@@ -33,7 +33,9 @@ export async function connectToCluster(URL) {
 }
 
 export async function executePost(post_body) {
-    flag=false;
+    let flag=false;
+    let mongoClient;
+
     try {
         mongoClient = await connectToCluster(DB_URL);
         const db = mongoClient.db(process.env.DB);
@@ -59,7 +61,9 @@ export async function executePost(post_body) {
 }
 
 export async function executeFavorUpdate(id,amount) {
-    flag = false;
+    let flag = false;
+    let mongoClient;
+
     try {
         mongoClient = await connectToCluster(DB_URL);
         const db = mongoClient.db(process.env.DB);
@@ -83,8 +87,10 @@ export async function executeFavorUpdate(id,amount) {
 }
 
 export async function executeGetAll() {
-    flag = false;
-    jsonArray = {};
+    let flag = false;
+    let jsonArray;
+    let mongoClient;
+
     try {
         mongoClient = await connectToCluster(DB_URL);
         const db = mongoClient.db(process.env.DB);
@@ -92,10 +98,13 @@ export async function executeGetAll() {
 
         console.log("MongoDB: Retrieving all...");
         
-        const cursor = await collection.find({});
-        await cursor.forEach((document) => {
-            jsonArray.push(document);
-        });
+        // deprecated by MongoDB Driver
+        // const cursor = await collection.find({});
+        // await cursor.forEach((document) => {
+        //     jsonArray.push(document);
+        // });
+
+        jsonArray = collection.find({});
 
         return jsonArray;
     } catch(err) {
@@ -133,8 +142,8 @@ app.get('/allusers', (req,res) => {
         return;
     }
 
-    content = error;
-    res.body = content;
+    //res.body = error; //not an error
+    res.json(error);
     res.status = 200;
 })
 
@@ -176,102 +185,9 @@ app.put('/favor',(req,res) => {
 
     res.status = 200;
 })
-/*
+
 app.post('/createcomment',(req,res) => {
-
-    //get object
-    //tell mongodb to start cooking
-    res.status = 201;
+    res.status = 501;
 })
-*/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// vv PORT THINGY IS THIS WAY vv
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//WAY
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//WAY WAY
-
-
-
-
-
-
-
-
-
-
-
-
-
-//WAY DOWN 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// HERE
-app.listen(8080, () => { console.log('server listening on port 8080') })
+app.listen(8080, () => { console.log(`server listening on port ${process.env.PORT}`) })
