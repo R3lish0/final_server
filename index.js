@@ -1,7 +1,7 @@
 import { config } from 'dotenv'
 import { MongoClient } from 'mongodb';
 import cors from 'cors';
-import express from 'express';
+import express, { json } from 'express';
 
 
 // const cors = require('cors');
@@ -39,7 +39,7 @@ export async function executePost(post_body) {
     try {
         mongoClient = await connectToCluster(DB_URL);
         const db = mongoClient.db(process.env.DB);
-        const collection = db.collection(process.env.collection);
+        const collection = db.collection(process.env.DB_Collection);
 
         console.log("MongoDB: Creating post...");
         const today = new Date();
@@ -67,7 +67,7 @@ export async function executeFavorUpdate(id,amount) {
     try {
         mongoClient = await connectToCluster(DB_URL);
         const db = mongoClient.db(process.env.DB);
-        const collection = db.collection(process.env.collection);
+        const collection = db.collection(process.env.DB_Collection);
 
         console.log("MongoDB: Updating favor...");
         
@@ -94,10 +94,10 @@ export async function executeGetAll() {
     try {
         mongoClient = await connectToCluster(DB_URL);
         const db = mongoClient.db(process.env.DB);
-        const collection = db.collection(process.env.collection);
+        const collection = db.collection(process.env.DB_Collection);
 
         console.log("MongoDB: Retrieving all...");
-        
+
         // deprecated by MongoDB Driver
         // const cursor = await collection.find({});
         // await cursor.forEach((document) => {
