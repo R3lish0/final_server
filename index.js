@@ -48,7 +48,7 @@ export async function executePost(post_body) {
             favor: 0,
             date: today,
         }
-        await collection.insertOne(newPost);
+        const result = await collection.insertOne(newPost);
     } catch(err) {
         console.error("MongoDB: ",err);
         flag=true;
@@ -71,9 +71,9 @@ export async function executeFavorUpdate(id,amount) {
 
         console.log("MongoDB: Updating favor...");
         
-        await collection.updateMany(
-            { id },
-            { $inc: {favor: amount} }
+        await collection.findOneAndUpdate(
+            { "_id":id},
+            { $inc: {"favor": amount} }
         )
     } catch(err) {
         console.error("MongoDB: ",err);
@@ -88,8 +88,8 @@ export async function executeFavorUpdate(id,amount) {
 
 export async function executeGetAll() {
     let flag = false;
-    let jsonArray;
     let mongoClient;
+    let response = [];
 
     try {
         mongoClient = await connectToCluster(DB_URL);
@@ -104,9 +104,11 @@ export async function executeGetAll() {
         //     jsonArray.push(document);
         // });
 
-        jsonArray = collection.find({});
+        let cursor = collection.find();
 
-        return jsonArray;
+        for await (const doc of cursor) {
+            response.push(doc);
+        }
     } catch(err) {
         console.error("MongoDB: ",err);
         flag = true;
@@ -118,7 +120,7 @@ export async function executeGetAll() {
             return flag;
         }
         
-        return jsonArray;
+        return response;
     }
 }
 
@@ -133,8 +135,8 @@ returns
 
 JSON array of post objects
 */
-app.get('/allusers', (req,res) => {
-    const error = executeGetAll();
+app.get('/allusers', async (req,res) => {
+    const error = await executeGetAll();
 
     if (error === true) {
         //DB unavailable
@@ -142,8 +144,8 @@ app.get('/allusers', (req,res) => {
         return;
     }
 
-    //res.body = error; //not an error
-    res.json(error);
+    //res.body = error; 
+    res.json(error); //not an error
     res.status = 200;
 })
 
@@ -152,23 +154,24 @@ app.get('/allusers', (req,res) => {
     content: ""
 }
 */
-app.post('/createpost',(req,res) => {
-    //Express should JSON-ify req automatically?..
+app.post('/createpost',async (req,res) => {
+    //Express should parse req body automatically?..
     let post_body = req.body.content
 
      //tell mongodb to start cooking
-    executePost(post_body);
+    await executePost(post_body);
 
     res.status = 201;
 })
 
+// executePost("Test post is here.");
 /*
 {
     id
     favor (1 or -1)
 }
 */
-app.put('/favor',(req,res) => {
+app.put('/favor', async (req,res) => {
     //Express should JSON-ify req automatically?..
     const body = req.body;
 
@@ -176,7 +179,7 @@ app.put('/favor',(req,res) => {
     const id = body.id;
 
      //tell mongodb to start cooking
-    const err = executeFavorUpdate(id,favor);
+    const err = await executeFavorUpdate(id,favor);
 
     if (flag) {
         res.status = 503;
