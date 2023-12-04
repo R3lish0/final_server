@@ -1,7 +1,8 @@
 import { config } from 'dotenv'
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import cors from 'cors';
 import express, { json } from 'express';
+
 
 
 // const cors = require('cors');
@@ -52,7 +53,8 @@ export async function executePost(post_body) {
     } catch(err) {
         console.error("MongoDB: ",err);
         flag=true;
-    } finally {
+    }
+    finally{
         await mongoClient.close();
         console.log("MongoDB: Done!");
 
@@ -63,6 +65,7 @@ export async function executePost(post_body) {
 export async function executeFavorUpdate(id,amount) {
     let flag = false;
     let mongoClient;
+ 
 
     try {
         mongoClient = await connectToCluster(DB_URL);
@@ -71,20 +74,30 @@ export async function executeFavorUpdate(id,amount) {
 
         console.log("MongoDB: Updating favor...");
         
-        await collection.findOneAndUpdate(
-            { "_id":id},
-            { $inc: {"favor": amount} }
+        let o_id = new ObjectId(id)
+
+        let res = await collection.findOneAndUpdate(
+            { "_id": o_id},
+            { $inc: {"favor": amount}}
         )
+        console.log(res)
     } catch(err) {
         console.error("MongoDB: ",err);
         flag = true;
-    } finally {
-        await mongoClient.close();
-        console.log("MongoDB: Done!");
-
-        return flag;
+    }
+    finally
+    {
+    await mongoClient.close();
+    console.log("MongoDB: Done!");
+    return flag
     }
 }
+
+
+
+
+
+
 
 export async function executeGetAll(sorted) {
     let flag = false;
@@ -153,6 +166,22 @@ app.get('/allusers', async (req,res) => {
     res.status = 200;
 })
 
+
+
+app.get('/test', async (req,res) => {
+    const error = await executeIdTest();
+
+    if (error === true) {
+        //DB unavailable
+        res.status = 503;
+        return;
+    }
+
+    //res.body = error; 
+    res.json(error); //not an error
+    res.status = 200;
+})
+
 app.get('/allusers-sorted', async (req,res) => {
     const error = await executeGetAll(true);
 
@@ -195,16 +224,15 @@ app.put('/favor', async (req,res) => {
 
     const favor = body.favor;
     const id = body.id;
-
+    //res.body = error;  //not an error
      //tell mongodb to start cooking
     const err = await executeFavorUpdate(id,favor);
 
-    if (flag) {
+    if (err === true) {
+        //DB unavailable
         res.status = 503;
-        res.statusMessage(err)
         return;
     }
-
     res.status = 200;
 })
 
