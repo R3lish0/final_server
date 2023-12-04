@@ -234,6 +234,9 @@ app.put('/favor', async (req,res) => {
         return;
     }
     res.status = 200;
+    res.send("good job buckaroo")
+
+    return err
 })
 
 app.post('/createcomment',(req,res) => {
