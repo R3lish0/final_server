@@ -13,7 +13,8 @@ config();
 const DB_URL = process.env.DB_URL;
 
 app.use(cors({
-    origin:"*"
+    origin:"*",
+    methods:["GET","POST","PUT"]
 }
 ))
 app.use(express.json());
