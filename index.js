@@ -86,7 +86,7 @@ export async function executeFavorUpdate(id,amount) {
     }
 }
 
-export async function executeGetAll() {
+export async function executeGetAll(sorted) {
     let flag = false;
     let mongoClient;
     let response = [];
@@ -103,8 +103,12 @@ export async function executeGetAll() {
         // await cursor.forEach((document) => {
         //     jsonArray.push(document);
         // });
-
-        let cursor = collection.find().sort( { favor : 1 } );
+        let cursor
+        if (sorted === true) {
+            cursor = collection.find().sort({favor : 1});
+        } else {
+            cursor = collection.find();
+        }
 
         for await (const doc of cursor) {
             response.push(doc);
@@ -137,6 +141,20 @@ JSON array of post objects
 */
 app.get('/allusers', async (req,res) => {
     const error = await executeGetAll();
+
+    if (error === true) {
+        //DB unavailable
+        res.status = 503;
+        return;
+    }
+
+    //res.body = error; 
+    res.json(error); //not an error
+    res.status = 200;
+})
+
+app.get('/allusers-sorted', async (req,res) => {
+    const error = await executeGetAll(true);
 
     if (error === true) {
         //DB unavailable

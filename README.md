@@ -13,14 +13,26 @@ EXPECT: "Hello from our server!"
 GET "/allusers"
 RETURNS: [200] or [503]
 EXPECT: JSON array of posts in such format:
-{
+[
     {
         content,
         favor,
         date,
     },
     ...
-}
+]
+
+GET "/allusers-sorted"
+RETURNS: [200] or [503]
+EXPECT: JSON array of SORTED posts in such format:
+[
+    {
+        content,
+        favor,
+        date,
+    },
+    ...
+]
 
 #########
 
