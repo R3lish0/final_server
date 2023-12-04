@@ -12,11 +12,7 @@ const app = express();
 config();
 const DB_URL = process.env.DB_URL;
 
-app.use(cors({
-    origin:"*",
-    methods:["GET","POST","PUT"]
-}
-))
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded());
 
