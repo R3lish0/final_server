@@ -201,6 +201,7 @@ app.put('/favor', async (req,res) => {
 
     if (flag) {
         res.status = 503;
+        res.statusMessage(err)
         return;
     }
 
