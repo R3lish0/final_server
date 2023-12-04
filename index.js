@@ -104,7 +104,7 @@ export async function executeGetAll() {
         //     jsonArray.push(document);
         // });
 
-        let cursor = collection.find();
+        let cursor = collection.find().sort( { favor : 1 } );
 
         for await (const doc of cursor) {
             response.push(doc);
