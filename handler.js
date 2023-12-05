@@ -1,10 +1,13 @@
-import { config } from 'dotenv'
-import { MongoClient, ObjectId } from 'mongodb';
+//import { config } from 'dotenv'
+const config = require('dotenv');
+//import { MongoClient, ObjectId } from 'mongodb';
+const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId;
 
-config();
+config.config();
 const DB_URL = process.env.DB_URL;
 
-export async function connectToCluster(URL) {
+async function connectToCluster(URL) {
     let mongoClient;
     
     try {
@@ -19,7 +22,7 @@ export async function connectToCluster(URL) {
     }
 }
 
-export async function executePost(post_body) {
+async function executePost(post_body) {
     let flag=false;
     let mongoClient;
 
@@ -48,7 +51,7 @@ export async function executePost(post_body) {
     }
 }
 
-export async function executeFavorUpdate(id,amount) {
+async function executeFavorUpdate(id,amount) {
     let flag = false;
     let mongoClient;
  
@@ -79,7 +82,7 @@ export async function executeFavorUpdate(id,amount) {
     }
 }
 
-export async function executeGetAll(sorted) {
+async function executeGetAll(sorted) {
     let flag = false;
     let mongoClient;
     let response = [];
@@ -115,3 +118,7 @@ export async function executeGetAll(sorted) {
         return response;
     }
 }
+
+module.executeGetAll = executeGetAll;
+module.executeFavorUpdate = executeFavorUpdate;
+module.executePost = executePost;

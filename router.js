@@ -1,39 +1,15 @@
-import { config } from 'dotenv'
-import { MongoClient, ObjectId } from 'mongodb';
-import cors from 'cors';
-import express, { json } from 'express';
-import { executeGetAll, executeFavorUpdate, executePost } from './handler.js';
+//import express, { json } from 'express';
+const express = require('express');
+//import { executeGetAll, executeFavorUpdate, executePost } from './handler.js';
+const handler = require('./handler.js');
+const executeGetAll = handler.executeGetAll;
+const executeFavorUpdate = handler.executeFavorUpdate;
+const executePost = handler.executePost;
 
-export const router = express.Router();
+var router = express.Router();
+
 
 router.route('/post')
-    .all(function (req, res) {
-        //middleware (nah)
-    })
-    .get('/', async (req, res) => {
-        const error = await handler.executeGetAll(false);
-
-        if (error === true) {
-            //DB unavailable
-            res.status = 503;
-            return;
-        }
-    
-        res.json(error); //not an error
-        res.status = 200;
-    })
-    .get('/sorted/', async (req, res) => {
-        const error = await handler.executeGetAll(true);
-
-        if (error === true) {
-            //DB unavailable
-            res.status = 503;
-            return;
-        }
-    
-        res.json(error); //not an error
-        res.status = 200;
-    })
     .post(async (req, res) => {
         let post_body = req.body.content
 
@@ -41,10 +17,42 @@ router.route('/post')
 
         res.status = 201;
     })
-    .post('/:id/comment',async (req,res) => {
+
+router.route('/post/')
+    .get(async (req,res) => {
+        const error = await executeGetAll(false);
+
+        if (error === true) {
+            //DB unavailable
+            res.status = 503;
+            return;
+        }
+    
+        res.json(error); //not an error
+        res.status = 200;
+    })
+
+router.route('/post/sorted')
+    .get(async (req,res) => {
+        const error = await executeGetAll(true);
+
+        if (error === true) {
+            //DB unavailable
+            res.status = 503;
+            return;
+        }
+    
+        res.json(error); //not an error
+        res.status = 200;
+    })
+
+router.route('/post/:id')
+    .delete(async (res,req) => {
         res.status = 501;
     })
-    .put('/:id/favor/:amount', async function (res, req) {
+
+router.route('/post/:id/favor/:amount')
+    .put(async (res, req) => {
         //Express should JSON-ify req automatically?..
         const body = req.body;
 
@@ -52,7 +60,7 @@ router.route('/post')
         const id = body.id;
         //res.body = error;  //not an error
         //tell mongodb to start cooking
-        const err = await handler.executeFavorUpdate(id,favor);
+        const err = await executeFavorUpdate(id,favor);
 
         if (err === true) {
             //DB unavailable
@@ -64,8 +72,5 @@ router.route('/post')
 
         return err
     })
-    .delete('/:id', async (res,req) => {
-        res.status = 501;
-    })
 
-//module.exports = router;
+module.exports = router;
