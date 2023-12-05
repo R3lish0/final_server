@@ -264,13 +264,21 @@ app.post('/createcomment',(req,res) => {
     res.status = 501;
 });
 
-app.delete('/deletepost',(req,res) => {
+app.delete('/deletepost', async (req,res) => {
     const body = req.body;
 
     const id = body.id;
 
-    res.status =200;
-    res.send("Successfully deleted post.")
+    let err = await executeDelete(id);
+
+    if (err === true) {
+        //DB unavailable
+        res.status = 503;
+        return;
+    }
+
+    res.status = 200;
+    res.send("Successfully deleted post.");
 })
 
 app.listen(8080, () => { console.log(`server listening on port ${process.env.PORT}`) })
