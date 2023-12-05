@@ -47,7 +47,7 @@ REQ FORMAT:
 #########
 
 PUT "/favor"
-RETURNS: [200] or [50]
+RETURNS: [200] or [503]
 EXPECT: nothing
 REQ FORMAT:
 {
@@ -56,6 +56,14 @@ REQ FORMAT:
 }
 
 #########
+
+DELETE "/deletepost"
+RETURNS: [200] or [503]
+EXPECT: nothing
+REQ FORMAT:
+{
+    id
+}
 
 step 2. the REAL truth
 

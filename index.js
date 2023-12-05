@@ -56,7 +56,7 @@ export async function executePost(post_body) {
     }
     finally{
         await mongoClient.close();
-        console.log("MongoDB: Done!");
+        console.log("MongoDB: Closed.!");
 
         return flag;
     }
@@ -80,7 +80,6 @@ export async function executeFavorUpdate(id,amount) {
             { "_id": o_id},
             { $inc: {"favor": amount}}
         )
-        console.log(res)
     } catch(err) {
         console.error("MongoDB: ",err);
         flag = true;
@@ -88,16 +87,10 @@ export async function executeFavorUpdate(id,amount) {
     finally
     {
     await mongoClient.close();
-    console.log("MongoDB: Done!");
+    console.log("MongoDB: Closed.");
     return flag
     }
 }
-
-
-
-
-
-
 
 export async function executeGetAll(sorted) {
     let flag = false;
@@ -131,13 +124,41 @@ export async function executeGetAll(sorted) {
         flag = true;
     } finally {
         await mongoClient.close();
-        console.log("MongoDB: Done!");
+        console.log("MongoDB: Closed.");
 
         if (flag) {
             return flag;
         }
         
         return response;
+    }
+}
+
+export async function executeDelete(id) {
+    let flag = false;
+    let mongoClient;
+ 
+    try {
+        mongoClient = await connectToCluster(DB_URL);
+        const db = mongoClient.db(process.env.DB);
+        const collection = db.collection(process.env.DB_Collection);
+
+        console.log("MongoDB: Deleting post...");
+        
+        let o_id = new ObjectId(id)
+
+        let res = await collection.deleteOne(
+            { "_id": o_id}
+        )
+    } catch(err) {
+        console.error("MongoDB: ",err);
+        flag = true;
+    }
+    finally
+    {
+        await mongoClient.close();
+        console.log("MongoDB: Closed.");
+    return flag
     }
 }
 
@@ -234,13 +255,22 @@ app.put('/favor', async (req,res) => {
         return;
     }
     res.status = 200;
-    res.send("good job buckaroo")
+    res.send("Successfully updated post.")
 
-    return err
+    return err;
 })
 
 app.post('/createcomment',(req,res) => {
     res.status = 501;
+});
+
+app.delete('/deletepost',(req,res) => {
+    const body = req.body;
+
+    const id = body.id;
+
+    res.status =200;
+    res.send("Successfully deleted post.")
 })
 
 app.listen(8080, () => { console.log(`server listening on port ${process.env.PORT}`) })
