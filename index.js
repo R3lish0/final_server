@@ -36,6 +36,7 @@ export async function connectToCluster(URL) {
 export async function executePost(post_body) {
     let flag=false;
     let mongoClient;
+    let id;
 
     try {
         mongoClient = await connectToCluster(DB_URL);
@@ -50,15 +51,20 @@ export async function executePost(post_body) {
             date: today,
         }
         const result = await collection.insertOne(newPost);
-    } catch(err) {
+
+        id = result.insertedId;
+    } catch(err) {console.log(result);
         console.error("MongoDB: ",err);
         flag=true;
     }
     finally{
         await mongoClient.close();
-        console.log("MongoDB: Closed.!");
+        console.log("MongoDB: Closed.");
 
-        return flag;
+        if (flag === true) {
+            return flag;
+        }
+        return id;
     }
 }
 
@@ -227,10 +233,15 @@ app.post('/createpost',async (req,res) => {
     let post_body = req.body.content
 
      //tell mongodb to start cooking
-    await executePost(post_body);
+    let error = await executePost(post_body);
+
+    if (error===true) {
+        res.status=503;
+        return;
+    }
 
     res.status = 200;
-    res.send("Post created!")
+    res.send(error);
 })
 
 app.put('/favor', async (req,res) => {
