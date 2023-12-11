@@ -229,16 +229,10 @@ app.post('/createpost',async (req,res) => {
      //tell mongodb to start cooking
     await executePost(post_body);
 
-    res.status = 201;
+    res.status = 200;
+    res.send("Post created!")
 })
 
-// executePost("Test post is here.");
-/*
-{
-    id
-    favor (1 or -1)
-}
-*/
 app.put('/favor', async (req,res) => {
     //Express should JSON-ify req automatically?..
     const body = req.body;
@@ -278,7 +272,7 @@ app.delete('/deletepost', async (req,res) => {
     }
 
     res.status = 200;
-    res.send("Successfully deleted post.");
+    res.send("Delete request completed!")
 })
 
 app.listen(8080, () => { console.log(`server listening on port ${process.env.PORT}`) })
