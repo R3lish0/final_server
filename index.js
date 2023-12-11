@@ -241,7 +241,7 @@ app.post('/createpost',async (req,res) => {
     }
 
     res.status = 200;
-    res.send(error);
+    res.json(error);
 })
 
 app.put('/favor', async (req,res) => {
