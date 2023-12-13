@@ -51,8 +51,9 @@ export async function executePost(post_body) {
             date: today,
         }
         const result = await collection.insertOne(newPost);
+        var user = await collection.findOne({_id:result.insertedId})
 
-        id = result.insertedId;
+        id = user._id
     } catch(err) {console.log(result);
         console.error("MongoDB: ",err);
         flag=true;
@@ -234,14 +235,14 @@ app.post('/createpost',async (req,res) => {
 
      //tell mongodb to start cooking
     let error = await executePost(post_body);
-
+    console.log(error)
     if (error===true) {
         res.status=503;
         return;
     }
 
     res.status = 200;
-    res.json(error);
+    res.send(error.toString());
 })
 
 app.put('/favor', async (req,res) => {
