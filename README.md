@@ -64,7 +64,3 @@ REQ FORMAT:
 {
     id
 }
-
-step 2. the REAL truth
-
-https://cuberule.com/
